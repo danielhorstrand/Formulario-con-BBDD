@@ -248,20 +248,8 @@ public class Controladora2 {
 	}
 	public void Buscar() throws SQLException{
 		
-		if(this.txtBuscar.getText().length()==0){
-			con = new ControladoraBBDD ();
-			
-			datos = con.ConsultaPersonas();
-			tabla.setItems(datos);
-			
-			col_nombre.setCellValueFactory(new PropertyValueFactory<Persona,String>("Nombre"));
-			col_apellido.setCellValueFactory(new PropertyValueFactory<Persona,String>("Apellido"));
-			col_email.setCellValueFactory(new PropertyValueFactory<Persona,String>("email"));
-			col_sexo.setCellValueFactory(new PropertyValueFactory<Persona,Character>("sexo"));
-			col_casado.setCellValueFactory(new PropertyValueFactory<Persona,Boolean>("casado"));
-
-			edicion = false;
-			indiceedicion = 0;
+		if(this.txtBuscar.getText().length()==0){		
+			initialize(); 
 		}else {
 			con = new ControladoraBBDD();
 			con.buscarPersona(this.txtBuscar.getText());
