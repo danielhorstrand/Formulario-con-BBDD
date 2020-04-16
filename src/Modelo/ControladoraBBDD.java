@@ -2,6 +2,7 @@ package Modelo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -75,11 +76,22 @@ public class ControladoraBBDD {
 	public void guardarPersona (Persona persona)  throws SQLException{
 		
 		Statement stm = conexion.createStatement();
-
+		
 		try{
-			String insertsql = "INSERT INTO DANIEL.PERSONAS VALUES ('" + persona.getNombre() + "','" + persona.getApellido() + "','" + persona.getEmail() + "','" + persona.getSexo() + "','" + persona.isCasado() + "')";
+			String insertsql = "INSERT INTO DANIEL.PERSONAS VALUES (?,?,?,?,?)";
 
-			int resultado = stm.executeUpdate(insertsql);
+			String auxcasado = "N";
+			if(persona.isCasado() == true){
+				auxcasado = "S";
+			}
+			PreparedStatement pstmt = conexion.prepareStatement (insertsql);
+			pstmt.setString(1, persona.getNombre());
+			pstmt.setString(2, persona.getApellido());
+			pstmt.setString(3, persona.getEmail());
+			pstmt.setString(4, Character.toString(persona.getSexo()));
+			pstmt.setString(5, auxcasado);
+			
+			int resultado = pstmt.executeUpdate();
 
 			if(resultado != 1){
 				System.out.println("Error en la inserción " + resultado);
@@ -102,11 +114,15 @@ public class ControladoraBBDD {
 	public void eliminarPersona (Persona persona)  throws SQLException{
 		
 		Statement stm = conexion.createStatement();
-
+		
 		try{
-			String insertsql = "DELETE DANIEL.PERSONAS WHERE EMAIL='" + persona.getEmail() + "'";
+			String insertsql = "DELETE DANIEL.PERSONAS WHERE EMAIL=?";
+			
+			PreparedStatement pstmt = conexion.prepareStatement (insertsql);
+			
+			pstmt.setString(1, persona.getEmail());
 
-			int resultado = stm.executeUpdate(insertsql);
+			int resultado = pstmt.executeUpdate();
 
 			if(resultado != 1){
 				System.out.println("Error en la inserción " + resultado);
@@ -126,9 +142,21 @@ public class ControladoraBBDD {
 		Statement stm = conexion.createStatement();
 
 		try{
-			String insertsql = "UPDATE DANIEL.PERSONAS SET NOMBRE='"+persona2.getNombre()+"', APELLIDO ='"+persona2.getApellido()+"', EMAIL ='"+persona2.getEmail()+"', SEXO ='"+persona2.getSexo()+"', CASADO ='"+ persona2.isCasado()+"' WHERE EMAIL='" + persona1.getEmail() + "'";
+			String insertsql = "UPDATE DANIEL.PERSONAS SET NOMBRE=?, APELLIDO =?, EMAIL =?, SEXO =?, CASADO =? WHERE EMAIL=?";
 
-			int resultado = stm.executeUpdate(insertsql);
+			String auxcasado = "N";
+			if(persona2.isCasado() == true){
+				auxcasado = "S";
+			}
+			PreparedStatement pstmt = conexion.prepareStatement (insertsql);
+			pstmt.setString(1, persona2.getNombre());
+			pstmt.setString(2, persona2.getApellido());
+			pstmt.setString(3, persona2.getEmail());
+			pstmt.setString(4, Character.toString(persona2.getSexo()));
+			pstmt.setString(5, auxcasado);
+			pstmt.setString(6, persona1.getEmail());
+			
+			int resultado = pstmt.executeUpdate();
 
 			if(resultado != 1){
 				System.out.println("Error en la modificacion " + resultado);
@@ -145,12 +173,16 @@ public class ControladoraBBDD {
 	
 	}
 	public ObservableList<Persona> buscarPersona (String apellidoBusqueda) throws SQLException {
-		ObservableList<Persona> listaPersonas =  FXCollections.observableArrayList();
 		
+		ObservableList<Persona> listaPersonas =  FXCollections.observableArrayList();
 		Statement stm = conexion.createStatement();
-		String selectsql = "SELECT NOMBRE, APELLIDO, EMAIL, SEXO, CASADO FROM DANIEL.PERSONAS WHERE APELLIDO='"+apellidoBusqueda+"'";
+		
+		String selectsql = "SELECT NOMBRE, APELLIDO, EMAIL, SEXO, CASADO FROM DANIEL.PERSONAS WHERE APELLIDO=?";
 
-		ResultSet resultado = stm.executeQuery(selectsql);
+		PreparedStatement pstmt = conexion.prepareStatement (selectsql);
+		pstmt.setString(1, apellidoBusqueda);
+		
+		ResultSet resultado = pstmt.executeQuery();
 	
 		try{
 			while (resultado.next()) {
